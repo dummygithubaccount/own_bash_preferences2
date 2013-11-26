@@ -36,7 +36,7 @@ function element { #(i, j)
 function open_tabs {
         for i in ${!services[@]}
         do
-    foo+=(--tab -e "bash -c \"exec bash --init-file $HOME/own_bash_preferences/tmp_bashrc/.bashrc_replacement_$(element "${services[$i]}" 0).sh\"")    
+    foo+=(--tab -e "bash -c \"exec bash --init-file $HOME/own_bash_preferences2/tmp_bashrc/.bashrc_replacement_$(element "${services[$i]}" 0).sh\"")    
     tmp_bashrc 
     #chmod 777 $HOME/workspace/tmp_bashrc/.bashrc_replacement_$(element "${services[$i]}" 0).sh                                                       
         done
@@ -48,7 +48,7 @@ function open_tabs {
 #creates temporary replacement .bashrc files for each tab
 function tmp_bashrc {
 
-cat << UDK_TERMINATOR > $HOME/own_bash_preferences/tmp_bashrc/.bashrc_replacement_$(element "${services[$i]}" 0).sh
+cat << UDK_TERMINATOR > $HOME/own_bash_preferences2/tmp_bashrc/.bashrc_replacement_$(element "${services[$i]}" 0).sh
 
 common_commands=(
 "./script/bundle_install"
@@ -56,6 +56,19 @@ common_commands=(
 "bundle exec rake db:migrate"
 "bundle exec rake db:seed"
 )
+
+workers_commands=(
+"cd orders_service && bundle exec rake resque:work QUEUE=orders_service &"
+"cd payment_service && bundle exec rake resque:work QUEUE=payment_service &"
+"cd communication_service && bundle exec rake resque:work QUEUE=communication_service &"
+"cd competition_management && bundle exec rake resque:work QUEUE=competition_management &"
+)
+
+#resque-web
+
+
+
+
 
 #create the commands to run in each tab
 function create_commands {
@@ -104,7 +117,7 @@ UDK_TERMINATOR
 #terminator, whole line is read and must only contain UDK_TERMINATOR, no spaces.
 }
 
-mkdir $HOME/own_bash_preferences/tmp_bashrc
+mkdir $HOME/own_bash_preferences2/tmp_bashrc
 open_tabs
 
 
