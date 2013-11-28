@@ -311,3 +311,19 @@
 	</entry>
 </gconf>
 
+
+
+
+
+gedit ~/.gitconfig
+[core]
+	editor = vim
+[color]
+	ui = true
+[alias]
+	st = status
+	co = checkout
+        br = branch
+[user]
+	name = edam
+	email = development@footballpools.com
