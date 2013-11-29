@@ -1,0 +1,39 @@
+\o /home/edam/postgres_output.txt
+select * from teams;
+select * from competitions;
+select * from fixtures;
+
+
+
+###############
+x = str.split('|').collect(&:strip)
+x[0] = x[0].to_i
+x[1]="'#{x[1]}'"
+
+
+File.open('/home/edam/sql_commands.psql', 'w') { |file| file.write("#{x[0]}, #{x[1]}, #{x[2]}, #{x[3]}, #{x[4]}")
+###########
+
+#INSERT INTO teams (id, name, created_at, updated_at, external_id) VALUES
+    (1336, 'Egypt', '2012-08-01 09:00:49.38898', '2012-08-22 12:41:37.111423', '10255');
+
+
+
+
+1336 | Egypt | 2012-08-01 09:00:49.38898  | 2012-08-22 12:41:37.111423 | 10255
+
+
+
+loading_uat_compman_into_dev.sh
+  #will read the tables and write to a txt file (or pipe to ruby)
+  #will then run 'convert_data_into_insert_command.rb'
+
+convert_data_into_insert_command.rb
+  #will read file into an array of lines i.e.  1336 | Egypt | 2012-08-01 09:00:49.38898  | 2012-08-22 12:41:37.111423 | 10255
+  #will get the number of columns, and columns names from the top line.
+  #convert each line to an equivalent line of sql i.e. (1336, 'Egypt', '2012-08-01 09:00:49.38898', '2012-08-22 12:41:37.111423', '10255'),
+  #will insert INSERT INTO teams (id, name, created_at, updated_at, external_id) VALUES
+  #save the file.psql
+  #will then execute the commands through system ' '.
+
+
