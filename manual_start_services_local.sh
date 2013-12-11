@@ -34,14 +34,14 @@ function element { #(i, j)
 
 
 function open_tabs {
-        for i in ${!services[@]}
-        do
+  for i in ${!services[@]}
+  do
     foo+=(--tab -e "bash -c \"exec bash --init-file $HOME/own_bash_preferences2/tmp_bashrc/.bashrc_replacement_$(element "${services[$i]}" 0).sh\"")    
     tmp_bashrc 
     #chmod 777 $HOME/workspace/tmp_bashrc/.bashrc_replacement_$(element "${services[$i]}" 0).sh                                                       
-        done
+  done
 
-        gnome-terminal "${foo[@]}"
+  gnome-terminal "${foo[@]}"
 }
 
 
@@ -57,6 +57,8 @@ common_commands=(
 "bundle exec rake db:seed"
 )
 
+#####################################################################
+#workers must wait for service
 workers_commands=(
 "cd orders_service && bundle exec rake resque:work QUEUE=orders_service &"
 "cd payment_service && bundle exec rake resque:work QUEUE=payment_service &"
@@ -64,9 +66,18 @@ workers_commands=(
 "cd competition_management && bundle exec rake resque:work QUEUE=competition_management &"
 )
 
-#resque-web
+function clear_redis {
+  redis-cli flushdb
+}
 
+function start_resque {
+  resque-web
+}
 
+function start_workers {
+
+}
+#####################################################################
 
 
 
@@ -80,20 +91,25 @@ function create_commands {
   
   if [ "$(element "${services[$i]}" 0)" == "customerservice" ] 
   then
-           cmd+="./script/run_for_test_integration.sh; "
-         elif [ "$(element "${services[$i]}" 0)" == "catalog_service" ]
-         then
-           wait_for_other_service "competition_management"
-           cmd+="bundle exec rails s -p $(element "${services[$i]}" 2); "  
-        else
-           cmd+="bundle exec rails s -p $(element "${services[$i]}" 2); "
-        fi
+    cmd+="bundle exec rake db:reset RAILS_ENV=test;"
+    cmd+="bundle exec rake db:migrate RAILS_ENV=test;"
+    cmd+="./script/run_for_test_integration.sh; "
+  elif [ "$(element "${services[$i]}" 0)" == "catalog_service" ]
+  then
+    #wait_for_other_service "competition_management"
+    wait_for_other_service "$(element "${services[5]}" 2)"
+    cmd+="bundle exec rails s -p $(element "${services[$i]}" 2); "  
+  else
+   cmd+="bundle exec rails s -p $(element "${services[$i]}" 2); "
+  fi
  } 
  
  function wait_for_other_service { #need to include a time-out
-  until [ -f "\$HOME/workspace/\$1/tmp/pids/server.pid" ] #check if this is actually the file to check!
+  until [[ -n \$(lsof -i :\$1) ]] #check if this is actually the file to check!
   do
-    : #noop
+    echo "waiting for service listening on port \$1"
+    sleep 5
+    #: #noop
   done
  }
   
