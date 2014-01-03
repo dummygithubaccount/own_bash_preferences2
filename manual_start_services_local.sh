@@ -10,6 +10,7 @@ services=(
 "payment_service | ps | 3005"
 "communication_service | comms | 3008"
 "offer_service | off | 3009"
+"silverpop_mock | spm | 9001"
 )
 
 #addition 4 7 => sum=11
@@ -55,9 +56,12 @@ common_commands=(
 "bundle exec rake db:reset"
 "bundle exec rake db:migrate"
 "bundle exec rake db:seed"
+"bundle exec rake db:reset RAILS_ENV=test"
+"bundle exec rake db:migrate RAILS_ENV=test"
+"bundle exec rake db:seed RAILS_ENV=test" #probably not necessary
 )
 
-#####################################################################
+##################################################################### not yet used
 #workers must wait for service
 workers_commands=(
 "cd orders_service && bundle exec rake resque:work QUEUE=orders_service &"
@@ -74,9 +78,9 @@ function start_resque {
   resque-web
 }
 
-function start_workers {
+#function start_workers {
 
-}
+#}
 #####################################################################
 
 
@@ -93,7 +97,8 @@ function create_commands {
   then
     cmd+="bundle exec rake db:reset RAILS_ENV=test;"
     cmd+="bundle exec rake db:migrate RAILS_ENV=test;"
-    cmd+="./script/run_for_test_integration.sh; "
+    #cmd+="./script/run_for_test_integration.sh; "
+    cmd+="bundle exec rails s -p 3001 -e testintegration; "
   elif [ "$(element "${services[$i]}" 0)" == "catalog_service" ]
   then
     #wait_for_other_service "competition_management"

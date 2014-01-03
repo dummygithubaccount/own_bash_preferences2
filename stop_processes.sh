@@ -10,6 +10,7 @@ services=(
 "payment_service"
 "communication_service"
 "offer_service"
+"silverpop_mock"
 )
 
 pids=($(ps aux | grep init-file | awk '{print $2}'))
